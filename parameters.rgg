@@ -19,9 +19,11 @@ static String pathData			= "d:/outputdata/";	// location for the output text fil
 static boolean writePlantTable	= true;			// true: write plant-level tables
 static boolean writeFieldTable	= true;			// true: write field-level tables
 static boolean writeLight		= false;		// true: record tile and sensor light variable (only for plant-independent tiles)
+static boolean writePhotoTable	= true;
+static boolean writeNPQTable	= true;
 
 // field parameters
-static int[] speciesSequence	= {cereal};		// sequence of species in adjacent strips (nr of values determines nr of strips)
+static int[] speciesSequence	= {soy};		// sequence of species in adjacent strips (nr of values determines nr of strips)
 static double stripDistance		= 0;			// extra distance between adjacent strips (THIS EXTRA AREA IS NOT INCLUDED IN THE CALCULATION OF STRIP BIOMASS OR YIELD)
 	// checkerboard
 static boolean checker			= false;		// true: primary species is placed in a checkerboard design with a second species (checkerSpecies)
@@ -62,7 +64,7 @@ static int timeToFlower			= 60;			// TO BE MADE A FUNCTION OF DAYLENGTH OR OTHER
 // light model options
 static double rfrIncoming		= 1.2;			// red/far-red ratio of the incoming radiation
 static int depth				= 10;			// maximum number of reflections / transmissions of a ray
-static LightModel lm			= new LightModel(5000000, depth);
+static LightModel lm			= new LightModel(4000000, depth);
 static FluxLightModel flm		= new FluxLightModel(20000000, depth);
 static boolean seeRays			= false;		// see direction of rays from light sources if true
 static boolean infinite			= true;			// clone the canopy to eliminate border effects
@@ -77,8 +79,8 @@ static double transmittanceFarRed	= 0.45;		// transmittance of far-red light by 
 
 // environmental settings
 const float latitude 			= 52 * Math.PI/180;	// the latitude of location of the scene
-static int startingDayOfYear	= 90;				// overall starting simulation day of year
-static double Ca				= 400;				// atmospheric CO2 level
+static int startingDayOfYear	= 90;				// overall starting simulation day of year (90)
+static double Ca				= 400;				// atmospheric CO2 level (400)
 static double VPD				= 1;				// vapour pressure deficit
 static double O2				= 210;				// oxygen level
 
@@ -341,6 +343,8 @@ if (species == cereal || species == grass) (
 // datasets
 const DatasetRef fieldOutput = new DatasetRef("Field-level output");
 const DatasetRef plantOutput = new DatasetRef("Plant-level output");
+const DatasetRef PhotoOutput = new DatasetRef("Photosynthesis output");
+const DatasetRef NPQOutput = new DatasetRef("NPQ output");
 
 const DatasetRef laidata = new DatasetRef("Leaf area index");
 const DatasetRef fieldFabs = new DatasetRef("Field fPAR");
