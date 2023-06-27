@@ -89,6 +89,38 @@ static void initDatasets()
 			setColumnKey(30,"bladeMass(mg)")
 
 		);
+		
+		PhotoOutput.clear();
+		PhotoOutput.(
+			setColumnKey(0,"time"),
+			setColumnKey(1,"tt(dd)"),
+			setColumnKey(2,"plant#"),
+			setColumnKey(3,"strip#"),
+			setColumnKey(4,"row#"),
+			setColumnKey(5,"pos#"),
+			setColumnKey(6,"Rank#"),
+			setColumnKey(7,"Height"),
+			setColumnKey(8,"absorbed PAR (umol/m2/s)"),
+			setColumnKey(9,"Photosynthesis (umol/m2/s)")
+			
+		);
+		
+		NPQOutput.clear();
+		NPQOutput.(
+			setColumnKey(0,"time"),
+			setColumnKey(1,"tt"),
+			setColumnKey(2,"plant"),
+			setColumnKey(3,"Tau1"),
+			setColumnKey(4,"Tau2"),
+			setColumnKey(5,"Rank"),
+			setColumnKey(6,"highPAR"),
+			setColumnKey(7,"lowPAR"),
+			setColumnKey(8,"An"),
+			setColumnKey(9,"NPQ"),
+			setColumnKey(10,"rNPQ"),
+			setColumnKey(11,"phiPSII")
+			
+		);
 		combiLight.clear();
 		combiLight.(
 			setColumnKey(0,"time(d)"),
