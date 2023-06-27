@@ -4,12 +4,17 @@ import static parameters.*;
 
 {
 	// field parameters
-	nrRows[soy] = 5;                  // number of rows
-	nrPlants[soy] = 1;                // number of plants in a row
-	rowDistance[soy] = 0.15;          // distance between rows
+	nrRows[soy] = 2;                  // number of rows
+	nrPlants[soy] = 2;                // number of plants in a row
+
+	//rowDistance[soy] = 0.5;          // distance between rows, 0.5
+	//plantDistance[soy] = 0.2;        // distance between plants in a row, 0.2
+
+	rowDistance[soy] = 0.4;          // distance between rows
 	plantDistance[soy] = 0.15;        // distance between plants in a row
+
 	delay[soy] = 0;                   // germination delay after start of simulation (in days, to represent late sowing)
-	harvest[soy] = 110;               // duration, i.e. harvest/removal time after emergence (in days)
+	harvest[soy] = 71;               // duration, i.e. harvest/removal time after emergence (in days)
 	hexa[soy] = false;                // true: hexagonal layout, rectangular otherwise
 	offspotIntraRow[soy] = 0;			// fraction of plant distance the plant seed is off-spot
 	offspotInterRow[soy] = 0;			// fraction of row distance the plant seed is off-spot
@@ -30,7 +35,7 @@ import static parameters.*;
 	teInt[soy] = 125;                 // internode growth duration
 	teLeaf[soy] = 125;                // leaf growth duration
 
-	maxWidthInt[soy] = 0.0075;			// maxium internode width
+	maxWidthInt[soy] = 0.0075;			// maximum internode width
 	specificInternodeLength[soy] = 0.18;  // internode ratio length / biomass (mm/mg)
 
 	amax[soy] = 37.7;                   // max photosynthesis rate
@@ -47,8 +52,8 @@ import static parameters.*;
 
 	rankLower[soy] = 1;				// final phtyomer that has properties of lower phytomers (e.g. nr of leaflets, leaf angle, etc) 
 
-	leafAngleLower[soy] = 45;		// insertion angle of lower leaves (90 = horizontal)
-	leafAngleUpper[soy] = 45;		// insertion angle of upper leaves (90 = horizontal)
+	leafAngleLower[soy] = 25;		// insertion angle of lower leaves (90 = horizontal)
+	leafAngleUpper[soy] = 25;		// insertion angle of upper leaves (90 = horizontal)
 
 	nrLeafletsLower[soy] = 1;				 // number of leaflets per leaf for the lower phytomers
 	nrLeafletsUpper[soy] = 3;				 // number of leaflets per leaf for the upper phytomers
@@ -67,7 +72,7 @@ import static parameters.*;
 	
 	SASextend[soy] = true;				// toggle internode SAS extention response
 	
-	branching[soy] = true;			 // toggle branching
+	branching[soy] = false;			 // toggle branching
 	tillersOnly[soy] = false;		// true: bud break only if parent internode has length 0 (= tillering)
 	dominance[soy] = 14;				// minimum dominance, so maximal branching phytomer distance, at infinitely large source/sink ratio (no neighbours)
 	srAbortThresh[soy] = 0;			// threshold sink/source ratio for branch abortion
