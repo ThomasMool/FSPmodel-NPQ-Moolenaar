@@ -1,5 +1,6 @@
 import static java.lang.Math.*;
-
+import static parameters.*;
+import static modules_organs.*;
 // code below adapted from Leaf project by A. Morales
 
 
@@ -114,6 +115,7 @@ final static double es_Tref = 237.3; // K
 final static double air_heat_capacity = 1200; // J/m3/K
 
 
+
 // C3 photosynthesis as described by Yin and Struik (2009) -> no energy balance
 class YinC3 {
 
@@ -152,10 +154,21 @@ class YinC3 {
   double E_TPU = 53.1;
   double D_TPU = 20.18;
   double S_TPU = 0.65;
-
+  double NPQm = 4;			// Maximum NPQ (Serôdio & Lavaud, 2011)
+  double n = 1.77;			// Sigmoidity of the NPQ-Irradiance curve (allosterity) (Serôdio & Lavaud, 2011)
+  double I50 = 500;			// Irradiance level where NPQ is 50% of NPQmax (Serôdio & Lavaud, 2011)
+  double e = 2.71828183;
+  double tau1 = 30;			// Rate constant of fast relaxing part of NPQ relaxation curve (Dall'Osto et al., 2014, Nilkens et al., 2010)
+  double tau2 = 1000;		// Rate constant of slow relaxing part of NPQ relaxation curve (Dall'Osto et al., 2014, Nilkens et al., 2010)
+  double tau3  = 1;			// Fraction of NPQ when t = 0, value is 1 to normalise NPQ relaxation
+  double npqS = 0.1;		// Steady state NPQ at long term exposure to low light levels (Nilkens et al., 2010)
+  double npqE = 0.7;		// Relaxation of NPQ explained by fast relaxing NPQ (fraction)
+  double npqM = 0.3;		// Relaxation of NPQ explained by slow relaxing NPQ (fraction)
+  double qP = 1;			// Photochemical quenching component; 1 in the dark, <1 under light conditions
+  double Fv_Fm = 0.81;		// Maximum PSII efficiency in the dark
 
   // Calculate net photosynthesis
-  double[] calc(double PAR, double Ca, double Tleaf, double VPD, double O2, double LN) {
+  double[] calc(double PAR, double Ca, double Tleaf, double VPD, double O2, double LN, int NPQtime, int rank, double age, int plantNumber, double NPQ) {
 
   	// Calculate values of parameters at leafN
   	double k2ll = k2ll_a*LN + k2ll_b;
@@ -187,11 +200,21 @@ class YinC3 {
     double  Ac = CalcAnC3(gm, gs0, fvpd, gb, x2_c, x1_c, gamma_star, Rd, Ca);
 
     // Limitation by electron transport
-    double J = (k2ll*PAR + Jmax - sqrt(pow(k2ll*PAR + Jmax,2) - 4*theta*k2ll*Jmax*PAR))/(2*theta);
+    double It;
+    if (time == 70) {
+    	It = 0.5;
+    } else {
+    	It = 1;
+    }
+    double rNPQ = npqS + (1-npqS) * npqE * pow(e, (-(NPQtime/tau1))) + (1 - npqS) * npqM * pow(e, (-(NPQtime/tau2))); //Double exponential relaxation curve of NPQ
+    double tNPQ = rNPQ * NPQ;  							//NPQ after multiplication with the relaxation fraction
+    double pPSII = qP * (Fv_Fm/(1+(1-Fv_Fm)* NPQ)); 	//PSII efficiency
+    double J = min((pPSII * (It*PAR) * 0.5), Jmax);		//ETR
+    //double J = (k2ll*(It*PAR) + Jmax - sqrt(pow(k2ll*(It*PAR) + Jmax,2) - 4*theta*k2ll*Jmax*(It*PAR)))/(2*theta); //J by A. Morales
     double x1_j = (J/4.0)*(1 - fpseudo/(1 - fcyc));
     double x2_j = 2*gamma_star;
     double  Aj = CalcAnC3(gm, gs0, fvpd, gb, x2_j, x1_j, gamma_star, Rd, Ca);
-
+    
     // Limitation by TPU
     double x1_p = 3.0*TPU;
     double x2_p = -gamma_star;
@@ -199,7 +222,27 @@ class YinC3 {
 
     // Minimum of three potential rates
     double  An = min(Ac,min(Aj,Ap));
+    //double An = Aj;
 
+    // Fill the NPQ data table with parameters 		
+			if(time == 70) {
+				NPQOutput.addRow().(
+				set(0,time),
+				set(1,age),
+				set(2,plantNumber),
+				set(3,tau1),
+				set(4,tau2),
+				set(5,rank),
+				set(6,PAR),
+				set(7,It*PAR),
+				set(8,An),
+				set(9,tNPQ),	
+				set(10,rNPQ),
+				set(11,pPSII),
+				set(12,NPQtime)
+			);
+			}   
+			
     // Transpiration
     double Ag = An + Rd;
     double Ci = CalcCi(gs0, An, Ca, Ci_star, Rd, fvpd);
