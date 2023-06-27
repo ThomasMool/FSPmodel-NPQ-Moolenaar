@@ -70,9 +70,13 @@ static void renew()
 	{
 		v.calcLight();
 		v.calcPhytochrome();
-		v.calcPhotosynthesis();
+		v.calcNPQ(v.absm2);
+		for (int NPQtime = 9; NPQtime<=300; NPQtime = NPQtime+10) { 
+			if (NPQtime <= 59) {
+		NPQtime = ((NPQtime-10)+1);} //NPQtime = NPQtime++ //
+		v.calcPhotosynthesis(NPQtime);
+		}
 	}
-	
 	// accumulate organ assimilates and sink strengths for the whole plant
 	// calculate the strength of the SAS response
 	pb:PlantBase ::> 
@@ -163,7 +167,7 @@ static void renew()
 		fb.updateYield();
 		if (writeFieldTable == true) {fb.updateTable();}
 	}
-	
+		
 	// calculate light on soil tiles and sensors
 	ref:RefTile ::>
 	{
