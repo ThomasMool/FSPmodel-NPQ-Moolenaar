@@ -4,9 +4,12 @@ import static modules_base.*;
 import static photosynthesis.*;
 import static RootModule.*;
 import static modules_light.*;
+import static java.lang.Math.*;
+
 
 import de.grogra.ray.physics.Spectrum;
 import de.grogra.ray.physics.Spectrum3d;
+
 
 // parent module for all plant organs
 abstract module Organ(super.length) extends M(length)
@@ -33,7 +36,7 @@ abstract module Organ(super.length) extends M(length)
 				age += (Math.max(0,tav - tb[species]));
 				ageD++;
 			}
-		}
+}
 		//if(this instanceof RootBase) {println(tav+" "+tb[species]+" "+age);}
 	}
 }
@@ -123,7 +126,21 @@ module VisibleOrgan extends GrowingOrgan
 	//photosynthesis
 	double photosynthesisRate;		// rate of photosynthesis  (umol CO2 / m2 / s)
 	double assimilated;				// assimilates acquired (mol CO2 / day)
+	double NPQ;
 	
+	void calcNPQ(double PAR){
+		    double It;
+    if (time == 70) {
+    	It = 1;
+    } else {
+    	It = 2;
+    }
+		  double NPQm = 4;			// Maximum NPQ (Serôdio & Lavaud, 2011)
+		  double n = 1.77;			// Sigmoidity of the NPQ-Irradiance curve (allosterity) (Serôdio & Lavaud, 2011)
+		  double I50 = 500;		
+	NPQ = (NPQm * (pow((It*PAR),n)/(pow(I50,n) + pow((It*PAR),n))));
+	}
+
 	// calculate light absorption
  	void calcLight()
 	{
@@ -233,7 +250,7 @@ module VisibleOrgan extends GrowingOrgan
 	// 1) Thornley model based on leaf Amax
 	// 2) FvCB model based on LN coming from light profile
 	// 3) FvCB model based on LN coming from root uptake (light profile determines N sink strength)
-	void calcPhotosynthesis()
+	void calcPhotosynthesis(int NPQtime)
 	{
 		if (FvCB == false) {
 			double Amax0 = amax[species];		// maximum photosynthesis rate at top of canopy
@@ -251,7 +268,8 @@ module VisibleOrgan extends GrowingOrgan
 			if (C4[species] == true) {
 				output = modelC4.calc(absm2, Ca, tav, VPD, O2, LNarea);
 			} else {
-				output = modelC3.calc(absm2, Ca, tav, VPD, O2, LNarea);
+				//for (int NPQtime = 1; NPQtime<=600; NPQtime++) {
+				output = modelC3.calc(absm2, Ca, tav, VPD, O2, LNarea, NPQtime, rank, age, plantNumber, NPQ);
 			}
 			photosynthesisRate = Math.max(0,output[2]);	
 			if(photosynthesisRate != photosynthesisRate) {		// means: if photosynthesisRate is NaN
@@ -266,12 +284,6 @@ module VisibleOrgan extends GrowingOrgan
 	// calculate organ dimensions (implemented in specific organ modules)
 	void calcDimensions();
 }
-
-
-
-
-
-
 
 // seed module
 module Seed extends Null
@@ -680,6 +692,7 @@ module Leaf extends VisibleOrgan
 			leafNProfile.getRow(rank).set(plantNumber,LNarea);
 		}
 	}
+
 	
 	// calculate the number of segments that the leaf is composed of
 	void calcSegments() {
@@ -687,6 +700,22 @@ module Leaf extends VisibleOrgan
 		segments = Math.max(50,Math.round(frBio * maxSegments));
 	}
 	
+	void updateTable() {
+			PhotoOutput.addRow().(
+				set(0,time),
+				set(1,age),
+				set(2,plantNumber),
+				//set(3,strip),
+				//set(4,row),
+				//set(5,pos),
+				set(6,rank),
+				//set(7,rank),
+				set(8,absm2),
+				set(9,photosynthesisRate)		
+			);
+
+	}	
+
 
 	// calculate frational area by integrating the leaf shape function in 100 steps of 0.01
 	void calcFractionalArea() {
